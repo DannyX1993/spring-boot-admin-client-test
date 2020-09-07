@@ -8,7 +8,9 @@ import org.springframework.web.context.annotation.RequestScope;
 import org.springframework.web.util.ContentCachingRequestWrapper;
 import org.springframework.web.util.ContentCachingResponseWrapper;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.stream.Collectors;
 
 @Component
 @RequestScope
@@ -27,18 +29,18 @@ public class ContentTraceManager {
         String responseBody = getResponseBody(wrappedResponse);
         getTrace().setResponseBody(responseBody);
     }
-    protected String getRequestBody(
-            ContentCachingRequestWrapper wrappedRequest) {
+    protected String getRequestBody(ContentCachingRequestWrapper wrappedRequest) {
         try {
             if (wrappedRequest.getContentLength() <= 0) {
                 return null;
             }
-            return new String(wrappedRequest.getContentAsByteArray(), 0,
-                    wrappedRequest.getContentLength(),
-                    wrappedRequest.getCharacterEncoding());
+            return wrappedRequest.getReader().lines().collect(Collectors.joining());
         } catch (UnsupportedEncodingException e) {
             logger.error(
                     "Could not read cached request body: " + e.getMessage());
+            return null;
+        } catch (IOException e) {
+            e.printStackTrace();
             return null;
         }
     }

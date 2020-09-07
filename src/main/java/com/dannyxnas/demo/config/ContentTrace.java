@@ -2,7 +2,9 @@ package com.dannyxnas.demo.config;
 
 import org.springframework.boot.actuate.trace.http.HttpTrace;
 import org.springframework.security.core.Authentication;
+import org.springframework.stereotype.Component;
 
+@Component
 public class ContentTrace {
     protected HttpTrace httpTrace;
     protected String requestBody;
